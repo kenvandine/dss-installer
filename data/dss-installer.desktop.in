@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Data Science
+Comment=Data Science
+Keywords=AI;ML;Data;
+Exec=dss-installer
+Icon=dss-installer.png
+Terminal=false
+Categories=Utility;

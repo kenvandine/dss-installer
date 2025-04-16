@@ -1,0 +1,21 @@
+Source: dss-installer
+Section: gnome
+Priority: optional
+Maintainer: Ken VanDine <ken.vandine@canonical.com>
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3,
+               meson (>= 0.61)
+Standards-Version: 4.6.0
+Homepage: https://github.com/kenvandine/dss-installer
+
+Package: dss-installer
+Architecture: all
+Depends: gir1.2-adw-1,
+         gir1.2-gtk-4.0,
+         gir1.2-snapd-2,
+         python3,
+         python3-gi,
+         ${python3:Depends},
+         ${misc:Depends},
+Description: Utility for Configuration of the Data Science Stack
