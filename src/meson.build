@@ -25,3 +25,10 @@ sources = [
 ]
 
 install_data(sources, install_dir: moduledir)
+
+scripts = [
+  'boostrap.sh',
+  'initialize.sh',
+  'setup.sh',
+]
+install_data(scripts, install_dir: pkgdatadir, install_mode: 'rwxr-xr-x')
