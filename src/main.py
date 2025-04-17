@@ -198,7 +198,6 @@ class MyApp(Adw.Application):
             self.initialized = False
 
         self.installed = any(snap['installed'] for snap in self.snaps.values())
-        print(self.installed)
         self.ready.set_visible(self.installed and self.initialized)
         if self.installed:
             print(f"All expected snaps found")
