@@ -4,6 +4,8 @@ gi.require_version('Gdk', '4.0')
 from gi.repository import Gtk, GLib, Gdk
 import subprocess
 import threading
+import os
+import datetime
 
 class Console(Gtk.Box):
     def __init__(self):
@@ -34,14 +36,27 @@ class Console(Gtk.Box):
         Gtk.StyleContext.add_provider_for_display(display, css_provider, 600)
         self.text_view.add_css_class("terminal")
 
-    def run_subprocess(self, command):
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        threading.Thread(target=self.read_output, args=(process,)).start()
+        # Create directory for logs and define timestamped logfile
+        xdg_cache_dir = os.environ.get('XDG_CACHE_HOME', '~/.cache')
+        xdg_cache_dir = os.path.expanduser(xdg_cache_dir)
+        log_dir = os.path.join(xdg_cache_dir, 'dss-installer')
+        os.makedirs(log_dir, exist_ok=True)
+        log_file = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+        self.log_file = os.path.join(log_dir, log_file)
 
-    def read_output(self, process):
+    def run_subprocess(self, command, callback):
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        threading.Thread(target=self.read_output, args=(process,callback,)).start()
+
+    def read_output(self, process, callback):
         for line in process.stdout:
             GLib.idle_add(self.append_text, line)
-        process.wait()
+        ret = process.wait()
+        callback(ret == 0)
 
     def append_text(self, text):
+        # Update textbuffer for UI
         self.text_buffer.insert(self.text_buffer.get_end_iter(), text)
+        # Also append to timestamped logfile
+        with open(self.log_file, 'a') as f:
+            print(text, file=f, end='')
