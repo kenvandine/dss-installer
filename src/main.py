@@ -22,6 +22,7 @@ class MyApp(Adw.Application):
         }
         self.installed = False
         self.initialized = False
+        self.initializing = False # dss initialize is running
 
     def do_activate(self):
         window = Adw.ApplicationWindow(application=self)
@@ -45,10 +46,6 @@ class MyApp(Adw.Application):
         self.setup_dss_button.set_visible(False)
         self.setup_dss_button.connect("clicked", self.on_setup_dss_clicked)
 
-        self.initialize_dss_button = Gtk.Button(label="Initialize Data Science Stack")
-        self.initialize_dss_button.set_visible(True)
-        self.initialize_dss_button.connect("clicked", self.on_initialize_dss_clicked)
-        
         self.spinner = Gtk.Spinner()
         self.spinner.set_visible(False)
 
@@ -68,7 +65,6 @@ class MyApp(Adw.Application):
         
         vbox.append(banner)
         vbox.append(self.setup_dss_button)
-        vbox.append(self.initialize_dss_button)
         vbox.append(self.spinner)
         vbox.append(self.ready)
         vbox.append(main_content)
@@ -140,10 +136,10 @@ class MyApp(Adw.Application):
             if not self.snaps[name]['installed']:
                 self.snap_install(name, self.snaps[name]['channel'], self.snaps[name]['classic'])
 
-    def on_initialize_dss_clicked(self, button):
-        print("Initialize button clicked!.")
-        if not self.initialized and self.installed:
-            self.initialize_dss_button.set_visible(False)
+    def initialize(self):
+        print("Initializing")
+        if not self.initialized and not self.initializing and self.installed:
+            self.initializing = True
             self.start_spinner()
             self.console.set_visible(True)
             setup_script = os.path.join(DSS_INSTALLER_DIR, 'setup.sh')
@@ -153,19 +149,18 @@ class MyApp(Adw.Application):
         print(f"on_initialize_dss_finished: {ret}")
         if ret:
             self.stop_spinner()
+            self.initializing = False
         self.update_snaps_ui()
 
     def start_spinner(self):
         self.spinner.start()
         self.spinner.set_visible(True)
         self.setup_dss_button.set_visible(False)
-        self.initialize_dss_button.set_visible(False)
 
     def stop_spinner(self):
         self.spinner.set_visible(False)
         self.spinner.stop()
         self.setup_dss_button.set_visible(not self.installed)
-        self.initialize_dss_button.set_visible(not self.initialized)
 
     def handle_snap_list(self, client, result):
         try:
@@ -207,8 +202,11 @@ class MyApp(Adw.Application):
             self.stop_spinner()
         else:
             print(f"Missing expected snaps")
+
         self.setup_dss_button.set_visible(not self.installed)
-        self.initialize_dss_button.set_visible(not self.initialized)
+
+        if self.installed and not self.initialized and not self.initializing:
+            self.initialize()
 
     def snap_install(self, package_name, channel="latest/stable", classic=False):
         print(f"snap_install: {package_name} {channel}")
