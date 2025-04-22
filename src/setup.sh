@@ -12,8 +12,10 @@ then
   usage
 fi
 
+script_dir=$(dirname $0)
+
 echo "Setting up the Data Science Stack"
-pkexec ./bootstrap.sh $USER
+pkexec $script_dir/bootstrap.sh $USER
 if [ $? -ne 0 ]
 then
     echo "Failed to bootstrap the Data Science Stack"
@@ -22,7 +24,7 @@ else
     echo "The Data Science Stack bootstrap successful"
 fi
 
-./initialize.sh
+$script_dir/initialize.sh
 if [ $? -ne 0 ]
 then
     echo "Failed to initialize the Data Science Stack"

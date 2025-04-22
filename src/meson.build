@@ -31,4 +31,4 @@ scripts = [
   'initialize.sh',
   'setup.sh',
 ]
-install_data(scripts, install_dir: pkgdatadir, install_mode: 'rwxr-xr-x')
+install_data(scripts, install_dir: moduledir, install_mode: 'rwxr-xr-x')

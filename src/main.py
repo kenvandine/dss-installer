@@ -7,6 +7,8 @@ gi.require_version('Snapd', '2')
 from gi.repository import Gtk, Adw, GLib, Snapd
 from console import Console
 
+DSS_INSTALLER_DIR = os.path.dirname(os.path.realpath(__file__))
+
 class MyApp(Adw.Application):
 
     def __init__(self):
@@ -144,7 +146,8 @@ class MyApp(Adw.Application):
             self.initialize_dss_button.set_visible(False)
             self.start_spinner()
             self.console.set_visible(True)
-            self.console.run_subprocess(['./setup.sh'], self.on_initialize_dss_finished)
+            setup_script = os.path.join(DSS_INSTALLER_DIR, 'setup.sh')
+            self.console.run_subprocess([setup_script], self.on_initialize_dss_finished)
 
     def on_initialize_dss_finished(self, ret):
         print(f"on_initialize_dss_finished: {ret}")
