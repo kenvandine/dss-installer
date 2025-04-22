@@ -27,7 +27,7 @@ sources = [
 install_data(sources, install_dir: moduledir)
 
 scripts = [
-  'boostrap.sh',
+  'bootstrap.sh',
   'initialize.sh',
   'setup.sh',
 ]
