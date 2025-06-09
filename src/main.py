@@ -195,7 +195,7 @@ class MyApp(Adw.Application):
             self.labels['initialized'].set_text(f"✗ DSS Initialized: False")
             self.initialized = False
 
-        self.installed = any(snap['installed'] for snap in self.snaps.values())
+        self.installed = all(snap['installed'] for snap in self.snaps.values())
         self.ready.set_visible(self.installed and self.initialized)
         if self.installed:
             print(f"All expected snaps found")
