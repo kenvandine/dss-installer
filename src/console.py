@@ -12,14 +12,14 @@ class Console(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.text_buffer = Gtk.TextBuffer()
         self.text_view = Gtk.TextView(buffer=self.text_buffer)
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_hexpand(True)
-        scrolled_window.set_vexpand(True)
-        scrolled_window.set_min_content_width(400)
-        scrolled_window.set_min_content_height(200)
-        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scrolled_window.set_child(self.text_view)
-        self.append(scrolled_window)
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_hexpand(True)
+        self.scrolled_window.set_vexpand(True)
+        self.scrolled_window.set_min_content_width(400)
+        self.scrolled_window.set_min_content_height(200)
+        self.scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.scrolled_window.set_child(self.text_view)
+        self.append(self.scrolled_window)
         self.visible = True
 
         # Load CSS
@@ -44,6 +44,12 @@ class Console(Gtk.Box):
         log_file = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
         self.log_file = os.path.join(log_dir, log_file)
 
+        # Automatically scroll to the end
+        self.scroll_to_end()
+
+        # Connect the signal to scroll to the end when new text is added
+        self.text_buffer.connect("changed", self.scroll_to_end)
+
     def run_subprocess(self, command, callback):
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         threading.Thread(target=self.read_output, args=(process,callback,)).start()
@@ -53,6 +59,12 @@ class Console(Gtk.Box):
             GLib.idle_add(self.append_text, line)
         ret = process.wait()
         callback(ret == 0)
+
+    def scroll_to_end(self, userdata=None):
+        # Get the vertical adjustment of the ScrolledWindow
+        adjustment = self.scrolled_window.get_vadjustment()
+        # Set the value to the maximum value to scroll to the end
+        adjustment.set_value(adjustment.get_upper() - adjustment.get_page_size())
 
     def append_text(self, text):
         # Update textbuffer for UI
