@@ -32,3 +32,13 @@ then
 else
     echo "The Data Science Stack initialization successful"
 fi
+
+echo "Installing the GPU Operator"
+pkexec $script_dir/gpu.sh $USER
+if [ $? -ne 0 ]
+then
+    echo "Failed to install GPU Operator"
+    exit 1
+else
+    echo "The Data Science Stack GPU Operator installed"
+fi

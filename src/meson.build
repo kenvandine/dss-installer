@@ -29,6 +29,7 @@ install_data(sources, install_dir: moduledir)
 scripts = [
   'bootstrap.sh',
   'initialize.sh',
+  'gpu.sh',
   'setup.sh',
 ]
 install_data(scripts, install_dir: moduledir, install_mode: 'rwxr-xr-x')
